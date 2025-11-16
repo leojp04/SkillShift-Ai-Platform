@@ -1,99 +1,136 @@
 # SkillShift.AI — Plataforma de Requalificação com IA
 
-Plataforma de requalificação profissional que aplica modelos de IA para interpretar perfis psicométricos, identificar macro-áreas de carreira e recomendar trilhas de aprendizado conforme o cluster comportamental.
+Plataforma de requalificação profissional baseada em Inteligência Artificial criada como parte da Global Solution da FIAP. A solução sugere macro-áreas de carreira e trilhas de cursos alinhadas ao perfil psicométrico dos participantes.
 
-## Arquitetura da IA
+## Badges
 
-- **Modelo de Classificação**: `RandomForestClassifier` treinado para classificar perfis nas macro-áreas Tech, Business e Human.
-- **Modelo de Agrupamento**: pipeline `StandardScaler` + `KMeans` (3 clusters) responsável por agrupar perfis e mapear trilhas recomendadas.
-- Os dois modelos consomem exatamente o mesmo vetor de 10 features numéricas e são carregados a partir de artefatos `.joblib` localizados em `/api/models`.
+![Status](https://img.shields.io/badge/Status-IA%20Ativa-success)
+![API](https://img.shields.io/badge/API-Flask-blue)
+![Modelos](https://img.shields.io/badge/Modelos-RandomForest%20%2B%20KMeans-orange)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB)
 
-## Modelo de Classificação (RandomForestClassifier — Tech, Business, Human)
+## Visão Geral da Arquitetura
 
-- Entrada: vetor de 10 features psicométricas ordenadas conforme `FEATURE_COLS` do `api/app.py`.
-- Saída: campo `macro_area` com o valor Tech, Business ou Human, acompanhado de `explicacao` textual embutida no código.
-- Implementação: `modelo_area.predict(X)` é chamado no endpoint `/predict-area`; erros de validação retornam HTTP 400 e falhas de carregamento retornam HTTP 500.
+### • Modelo 1 — Classificação (RandomForestClassifier)
 
-## Modelo de Agrupamento (K-Means + StandardScaler — 3 clusters)
+- Classes previstas: Tech, Business, Human.
+- Consome 10 features psicométricas e cognitivas.
 
-- Pré-processamento: `StandardScaler` serializado é aplicado para manter a mesma escala usada no treinamento.
-- Agrupamento: `KMeans` com `n_clusters = 3` retorna o índice inteiro do cluster.
-- Saída: `cluster` (0, 1 ou 2) e lista `cursos_recomendados` correspondente, definida estaticamente no `api/app.py`.
+### • Modelo 2 — Agrupamento (K-Means + StandardScaler)
 
-## Lista dos arquivos .joblib na pasta /models
+- Agrupamento em 3 clusters.
+- Realiza recomendação automática de trilhas.
 
-- `/api/models/modelo_career_area_3classes.joblib` — RandomForestClassifier para macro-áreas.
-- `/api/models/modelo_perfis_clusters.joblib` — Objeto contendo `scaler` e `kmeans` usados na etapa de clusterização.
+Ambos os modelos foram treinados em Python, serializados em arquivos `.joblib` e são carregados pela API Flask para respostas em tempo real.
 
-## Lista completa das 10 features usadas pelos modelos
+## Diagrama da Arquitetura
 
-1. `O_score`
-2. `C_score`
-3. `E_score`
-4. `A_score`
-5. `N_score`
-6. `Numerical Aptitude`
-7. `Spatial Aptitude`
-8. `Perceptual Aptitude`
-9. `Abstract Reasoning`
-10. `Verbal Reasoning`
+```mermaid
+flowchart LR
+    User --> API
+    API --> Model1[RandomForest<br>Classificação]
+    API --> Model2[K-Means<br>Clusters]
+    Model1 --> MacroArea
+    Model2 --> Recomendacoes
+```
 
-## Explicação técnica dos dois endpoints da API Flask
+## Arquivos dos modelos
 
-- **POST `/predict-area`**: recebe JSON com as 10 features, chama `extrair_features`, executa `modelo_area.predict` e devolve `macro_area` + `explicacao`. Falta de campos ou dados não numéricos gera `400`; ausência do modelo gera `500`.
-- **POST `/cluster-profile`**: consome o mesmo JSON, aplica `scaler_clusters.transform`, executa `kmeans.predict` e retorna `cluster` + `cursos_recomendados`. Erros de entrada retornam `400`; falta de artefatos produz `500`.
+```
+/models/
+  modelo_career_area_3classes.joblib
+  modelo_perfis_clusters.joblib
+```
 
-## Exemplos de requisições CURL (em uma linha, formato CMD)
+## Features utilizadas pelos modelos
+
+```
+O_score
+C_score
+E_score
+A_score
+N_score
+Numerical Aptitude
+Spatial Aptitude
+Perceptual Aptitude
+Abstract Reasoning
+Verbal Reasoning
+```
+
+## Documentação da API
+
+### A) POST /predict-area
+
+- Entrada: JSON contendo as 10 features.
+- Saída:
+
+  ```json
+  {
+    "macro_area": "Tech",
+    "explicacao": "texto explicando a macro-área"
+  }
+  ```
+
+### B) POST /cluster-profile
+
+- Entrada: JSON contendo as 10 features.
+- Saída:
+
+  ```json
+  {
+    "cluster": 1,
+    "cursos_recomendados": [...]
+  }
+  ```
+
+## Exemplos de chamadas via CURL (CMD)
 
 ```bash
-curl -X POST http://127.0.0.1:5000/predict-area -H "Content-Type: application/json" -d "{\"O_score\":62.5,\"C_score\":71.2,\"E_score\":58.0,\"A_score\":69.1,\"N_score\":35.4,\"Numerical Aptitude\":78.0,\"Spatial Aptitude\":65.0,\"Perceptual Aptitude\":72.3,\"Abstract Reasoning\":74.8,\"Verbal Reasoning\":81.0}"
+curl -X POST http://127.0.0.1:5000/predict-area -H "Content-Type: application/json" -d "{\"O_score\":6.5,\"C_score\":7.8,\"E_score\":5.9,\"A_score\":6.2,\"N_score\":4.1,\"Numerical Aptitude\":7.5,\"Spatial Aptitude\":6.8,\"Perceptual Aptitude\":7.2,\"Abstract Reasoning\":7.9,\"Verbal Reasoning\":6.3}"
 ```
-```json
-{"macro_area":"Tech","explicacao":"Macro-área de tecnologia e engenharia: dados, programação, análise lógica, resolução de problemas complexos e trabalho com sistemas."}
-```
+
 ```bash
-curl -X POST http://127.0.0.1:5000/cluster-profile -H "Content-Type: application/json" -d "{\"O_score\":62.5,\"C_score\":71.2,\"E_score\":58.0,\"A_score\":69.1,\"N_score\":35.4,\"Numerical Aptitude\":78.0,\"Spatial Aptitude\":65.0,\"Perceptual Aptitude\":72.3,\"Abstract Reasoning\":74.8,\"Verbal Reasoning\":81.0}"
-```
-```json
-{"cluster":0,"cursos_recomendados":["Trilha: Fundamentos de programação","Curso: Python para Iniciantes","Curso: Lógica de Programação"]}
+curl -X POST http://127.0.0.1:5000/cluster-profile -H "Content-Type: application/json" -d "{\"O_score\":6.5,\"C_score\":7.8,\"E_score\":5.9,\"A_score\":6.2,\"N_score\":4.1,\"Numerical Aptitude\":7.5,\"Spatial Aptitude\":6.8,\"Perceptual Aptitude\":7.2,\"Abstract Reasoning\":7.9,\"Verbal Reasoning\":6.3}"
 ```
 
-## Guia de instalação e execução da API
+## Exemplo de uso em Python
 
-1. **Criar venv**
-   ```bash
-   python -m venv .venv
-   ```
-2. **Ativar venv**
-   - Linux/macOS: `source .venv/bin/activate`
-   - Windows (CMD): `.\.venv\Scripts\activate`
-3. **Instalar requirements**
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. **Rodar `python api/app.py`**
-   ```bash
-   python api/app.py
-   ```
+```python
+import requests
 
-## Aviso sobre a compatibilidade das versões do scikit-learn
+payload = { ... }
 
-Os modelos foram serializados com `scikit-learn==1.6.1`. Para evitar erros ao carregar os artefatos `.joblib`, mantenha a mesma versão especificada em `requirements.txt`; versões diferentes podem quebrar a desserialização ou alterar o comportamento dos algoritmos.
+r = requests.post("http://127.0.0.1:5000/predict-area", json=payload)
+print(r.json())
+```
 
-## Estrutura de diretórios esperada do projeto
+## Instalação e Execução da API
+
+```
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python api/app.py
+```
+
+## Estrutura do Projeto
 
 ```
 skillshift-ai-platform/
-├── README.md
-├── requirements.txt
+│
 ├── api/
-│   ├── app.py
-│   └── models/
-│       ├── modelo_career_area_3classes.joblib
-│       └── modelo_perfis_clusters.joblib
+│   └── app.py
+├── models/
+│   ├── modelo_career_area_3classes.joblib
+│   └── modelo_perfis_clusters.joblib
 ├── data/
-│   └── ...
-└── documentacao_modelos_ia.txt
+│   └── Data_final.csv
+├── requirements.txt
+└── README.md
 ```
+
+## Aviso sobre compatibilidade
+
+Os modelos foram treinados com scikit-learn 1.6.1 e executados com 1.5.2, o que gera warnings esperados durante o carregamento.
 
 
