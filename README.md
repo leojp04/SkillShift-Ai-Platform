@@ -65,9 +65,13 @@ Verbal Reasoning
 
 ### A) GET /
 
+Exemplo de resposta:
+
+```json
 {
   "mensagem": "SkillShift.AI API online"
 }
+
 
 ### B) POST /predict-area
 
@@ -120,28 +124,57 @@ print(r.json())
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-python api/app.py
+cd api
+python app.py
 ```
 
 ## Estrutura do Projeto
 
 ```
-skillshift-ai-platform/
+SKILLSHIFT-AI-PLATFORM/
 │
+├── .git/
 ├── api/
-│   └── app.py
+│   ├── app.py
+│   └── models/
+│       ├── modelo_career_area_3classes.joblib
+│       └── modelo_perfis_clusters.joblib
+│
+├── data/
+│   └── Data_final.csv
+│
 ├── notebooks/
 │   ├── SkillShift_Ai_Platform.ipynb
 │   └── skillshift_ai_platform.py
-├── models/
-│   ├── modelo_career_area_3classes.joblib
-│   └── modelo_perfis_clusters.joblib
-├── data/
-│   └── Data_final.csv
+│
+├── integrantes.txt
 ├── requirements.txt
 └── README.md
 ```
 
+
+## Evidências de Execução
+
+Abaixo, alguns prints de execução local da API:
+
+1. **API Flask iniciada com sucesso**
+
+   ![API rodando localmente](docs/prints/api-running.png)
+
+2. **Resposta da rota GET /**
+
+   ![Resposta GET /](docs/prints/get-root.png)
+
+3. **Resposta do POST /predict-area**
+
+   ![Resposta POST /predict-area](docs/prints/post-predict-area.png)
+
+4. **Resposta do POST /cluster-profile**
+
+   ![Resposta POST /cluster-profile](docs/prints/post-cluster-profile.png)
+
 ## Aviso sobre compatibilidade
 
-Os modelos foram treinados com scikit-learn 1.6.1 e executados com 1.5.2, o que gera warnings esperados durante o carregamento.
+Os modelos foram treinados e executados com a mesma versão principal do scikit-learn (linha 1.x).  
+Versões diferentes podem gerar *warnings* de compatibilidade, mas não impedem a execução da API.
+
