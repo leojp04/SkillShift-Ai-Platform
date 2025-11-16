@@ -9,35 +9,44 @@ Plataforma de requalificação profissional baseada em Inteligência Artificial 
 ![Modelos](https://img.shields.io/badge/Modelos-RandomForest%20%2B%20KMeans-orange)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB)
 
+---
+
 ## Visão Geral da Arquitetura
 
-### • Modelo 1 — Classificação (RandomForestClassifier)
+A solução é composta por:
 
-- Classes previstas: Tech, Business, Human.
-- Consome 10 features psicométricas e cognitivas.
+- **Modelo 1 — Classificação (RandomForestClassifier)**
+  - Prevê **3 macro-áreas de carreira**: `Tech`, `Business`, `Human`.
+  - Usa 10 features psicométricas e de aptidão.
 
-### • Modelo 2 — Agrupamento (K-Means + StandardScaler)
+- **Modelo 2 — Agrupamento (K-Means + StandardScaler)**
+  - Agrupa perfis em **3 clusters** com base nas mesmas 10 features.
+  - Cada cluster recebe uma **trilha de cursos recomendada**.
 
-- Agrupamento em 3 clusters.
-- Realiza recomendação automática de trilhas.
+Ambos os modelos são treinados em Python, serializados em `.joblib` e carregados pela **API Flask** para respostas em tempo real.
 
-Ambos os modelos foram treinados em Python, serializados em arquivos `.joblib` e são carregados pela API Flask para respostas em tempo real.
+---
 
 ## Diagrama da Arquitetura
 
 ```mermaid
 flowchart LR
-    User --> API
-    API --> Model1[RandomForest<br>Classificação]
-    API --> Model2[K-Means<br>Clusters]
-    Model1 --> MacroArea
-    Model2 --> Recomendacoes
-```
+
+    U[Usuário<br/>Questionário / Plataforma] --> A[API Flask<br/>SkillShift.AI]
+
+    A --> RF[Modelo 1<br/>RandomForest<br/>Classificação]
+    RF --> MA[Macro-área<br/>(Tech / Business / Human)]
+
+    A --> KM[Modelo 2<br/>K-Means + Scaler<br/>Agrupamento]
+    KM --> C[Cluster de Perfil]
+    C --> REC[Recomendações<br/>de Trilhas]
+
+
 
 ## Arquivos dos modelos
 
 ```
-/models/
+api/models/
   modelo_career_area_3classes.joblib
   modelo_perfis_clusters.joblib
 ```
@@ -59,7 +68,13 @@ Verbal Reasoning
 
 ## Documentação da API
 
-### A) POST /predict-area
+### A) GET /
+
+{
+  "mensagem": "SkillShift.AI API online"
+}
+
+### B) POST /predict-area
 
 - Entrada: JSON contendo as 10 features.
 - Saída:
@@ -71,7 +86,7 @@ Verbal Reasoning
   }
   ```
 
-### B) POST /cluster-profile
+### C) POST /cluster-profile
 
 - Entrada: JSON contendo as 10 features.
 - Saída:
@@ -120,6 +135,9 @@ skillshift-ai-platform/
 │
 ├── api/
 │   └── app.py
+├── notebooks/
+│   ├── SkillShift_Ai_Platform.ipynb
+│   └── skillshift_ai_platform.py
 ├── models/
 │   ├── modelo_career_area_3classes.joblib
 │   └── modelo_perfis_clusters.joblib
@@ -132,5 +150,4 @@ skillshift-ai-platform/
 ## Aviso sobre compatibilidade
 
 Os modelos foram treinados com scikit-learn 1.6.1 e executados com 1.5.2, o que gera warnings esperados durante o carregamento.
-
 
