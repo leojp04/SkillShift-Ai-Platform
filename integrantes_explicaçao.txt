@@ -1,0 +1,40 @@
+SkillShift.AI 
+Documento de Arquitetura e Identificação do Grupo
+
+Integrantes do Grupo:
+- Fabrício Henrique Pereira — RM563237
+- Leonardo José Pereira — RM563065
+- Pedro Henrique de Oliveira — RM562312
+
+Descrição Geral da Solução:
+O SkillShift.AI é uma plataforma de requalificação profissional que utiliza Inteligência Artificial para sugerir macro-áreas de carreira e trilhas de cursos personalizadas, com base no perfil psicométrico e cognitivo dos participantes.
+
+Modelos desenvolvidos:
+1) Classificação — RandomForestClassifier
+   • Prediz a macro-área (Tech, Business, Human)
+   • Utiliza 10 features psicométricas e cognitivas
+   • Modelo salvo em: models/modelo_career_area_3classes.joblib
+
+2) Agrupamento — K-Means (com StandardScaler)
+   • Segmenta participantes em 3 clusters distintos
+   • Gera recomendações automáticas de trilhas de estudo
+   • Modelo salvo em: models/modelo_perfis_clusters.joblib
+
+Componentes da Entrega:
+- Dataset original: data/Data_final.csv
+- Notebook completo de análise e treinamento: SkillShift_Ai_Platform.ipynb
+- API Flask com rotas REST:
+    • POST /predict-area → classificação da macro-área
+    • POST /cluster-profile → cluster + recomendações
+- Código executável da API em: api/app.py
+- Documentação completa em: README.md
+- Arquivo de dependências: requirements.txt
+
+Resumo Técnico:
+A API carrega os modelos .joblib em tempo real, recebe 10 variáveis numéricas via JSON e retorna:
+• Macro-área prevista (modelo de classificação)
+• Justificativa da macro-área
+• Cluster psicométrico do participante (modelo de agrupamento)
+• Recomendação de trilha baseada no cluster
+
+
