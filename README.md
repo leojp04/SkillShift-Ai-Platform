@@ -31,17 +31,12 @@ Ambos os modelos são treinados em Python, serializados em `.joblib` e carregado
 
 ```mermaid
 flowchart LR
-
-    U[Usuário<br/>Questionário / Plataforma] --> A[API Flask<br/>SkillShift.AI]
-
-    A --> RF[Modelo 1<br/>RandomForest<br/>Classificação]
-    RF --> MA[Macro-área<br/>(Tech / Business / Human)]
-
-    A --> KM[Modelo 2<br/>K-Means + Scaler<br/>Agrupamento]
-    KM --> C[Cluster de Perfil]
-    C --> REC[Recomendações<br/>de Trilhas]
-
-
+    User[Usuário / Plataforma] --> API[API Flask / SkillShift.AI]
+    API --> Model1[RandomForest\nClassificação]
+    API --> Model2[K-Means + Scaler\nAgrupamento]
+    Model1 --> MacroArea[Macro-área]
+    Model2 --> Recs[Recomendações]
+```
 
 ## Arquivos dos modelos
 
@@ -150,4 +145,3 @@ skillshift-ai-platform/
 ## Aviso sobre compatibilidade
 
 Os modelos foram treinados com scikit-learn 1.6.1 e executados com 1.5.2, o que gera warnings esperados durante o carregamento.
-
