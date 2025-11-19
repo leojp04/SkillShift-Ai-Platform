@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import joblib
 import numpy as np
 from pathlib import Path
+import os  # <-- para ler a porta do ambiente (Render)
 
 app = Flask(__name__)
 
@@ -146,4 +147,6 @@ def cluster_profile():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Render passa a porta via variável de ambiente PORT
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
