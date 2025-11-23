@@ -2,6 +2,10 @@
 
 Plataforma de requalificação profissional baseada em Inteligência Artificial criada como parte da Global Solution da FIAP. A solução sugere macro-áreas de carreira e trilhas de cursos alinhadas ao perfil psicométrico dos participantes.
 
+## Repositório
+
+https://github.com/leojp04/SkillShift-Ai-Platform
+
 ## Badges
 
 ![Status](https://img.shields.io/badge/Status-IA%20Ativa-success)
@@ -179,4 +183,3 @@ Abaixo, alguns prints de execução local da API:
 
 Os modelos foram treinados e executados com a mesma versão principal do scikit-learn (linha 1.x).  
 Versões diferentes podem gerar *warnings* de compatibilidade, mas não impedem a execução da API.
-
