@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import joblib
 import numpy as np
 from pathlib import Path
 import os  # <-- para ler a porta do ambiente (Render)
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # ==========================================================
 # Caminhos base
