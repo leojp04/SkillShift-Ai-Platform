@@ -8,6 +8,8 @@ Plataforma de requalificação profissional baseada em Inteligência Artificial 
 ![API](https://img.shields.io/badge/API-Flask-blue)
 ![Modelos](https://img.shields.io/badge/Modelos-RandomForest%20%2B%20KMeans-orange)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB)
+[![Deploy](https://img.shields.io/badge/Deploy-Vercel-black)](https://skill-shift-ai-rust.vercel.app)
+
 
 ---
 
